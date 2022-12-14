@@ -9,7 +9,7 @@ function App() {
     if (count) {
       // TODO
     }
-  }, [count]); 
+  }, [count]);
 
   return (
     <div className="App">
