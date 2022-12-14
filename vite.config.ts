@@ -13,7 +13,7 @@ export default defineConfig({
   css: {
     modules: {
       generateScopedName: "[local]-[hash]",
-      localsConvention: "camelCase",
+      localsConvention: "camelCaseOnly",
     },
   },
   server: {
