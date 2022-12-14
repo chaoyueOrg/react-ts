@@ -1,10 +1,12 @@
-import { useCallback } from "react";
+import { observer } from "mobx-react";
+import app from "@/store/app";
 import "./App.css";
 import Home from "./pages/home";
+import { useDebounceEffect } from "ahooks";
 
 function App() {
-  useCallback(() => {
-    // TODO
+  useDebounceEffect(() => {
+    console.log(app.id);
   }, []);
 
   return (
@@ -14,4 +16,4 @@ function App() {
   );
 }
 
-export default App;
+export default observer(App);
