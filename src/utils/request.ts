@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
-
+import qs from "qs";
 export interface ApiClientOptions {
   host: string;
   basePath?: string;
@@ -16,10 +16,16 @@ export function configureApiClient(options: ApiClientOptions): AxiosInstance {
     baseURL: buildUrl(options.host, options.basePath ?? ""),
     withCredentials: true,
     responseType: "json",
+    timeout: 1000 * 30,
     paramsSerializer: {
-      serialize: (params: unknown): string => JSON.stringify(params),
+      serialize: (params) => qs.stringify(params, { arrayFormat: "brackets" }),
     },
   });
+  // instance.interceptors.request.use((config: any) => {
+  //   const token = localStorage.getItem("X-Access-Token") ?? "";
+  //    config.headers["X-Access-Token"] = token;
+  //   return config;
+  // });
   instance.interceptors.response.use(
     (response: AxiosResponse): AxiosResponse | Promise<AxiosResponse> => {
       if (typeof response.data !== "object") {
@@ -30,8 +36,17 @@ export function configureApiClient(options: ApiClientOptions): AxiosInstance {
     (err) => {
       if (err.response?.status == 401 && location.pathname !== "/login") {
         window.location.href = "/login";
+      } else if (err.code === "ERR_NETWORK") {
+        console.log("error", "网络中断", err.message);
+      } else if (err.code === "ECONNABORTED") {
+        console.log("error", "网络超时", err.message);
       }
-      return Promise.reject(err);
+      return Promise.resolve({
+        data: {
+          result: null,
+          message: err.message,
+        },
+      });
     }
   );
 
@@ -42,7 +57,7 @@ export function configureApiClient(options: ApiClientOptions): AxiosInstance {
 export const API_BASE_PATH = "/api";
 
 const apiOptions: ApiClientOptions = {
-  host: import.meta.env.VITE_API_HOST,
+  host: "",
   basePath: API_BASE_PATH,
 };
 
